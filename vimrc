@@ -1,9 +1,9 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Blog_post: 
+" Blog_post:
 "       http://amix.dk/blog/post/19486#The-ultimate-vim-configuration-vimrc
 " Syntax_highlighted:
 "       http://amix.dk/vim/vimrc.html
-" Raw_version: 
+" Raw_version:
 "       http://amix.dk/vim/vimrc.txt
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -19,11 +19,44 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " {{ golang
+Bundle "majutsushi/tagbar"
+nmap <c-w><c-e> :TagbarToggle<CR>
+
 Bundle "fatih/vim-go"
 " Enable goimports to automatically insert import paths instead of gofmt:
 let g:go_fmt_command = "goimports"
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+\ }
+" save auto savgolint "
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 " 避免和 NERDTreeTabsToggle 键冲突
-let g:go_def_mapping_enabled = 0
+" let g:go_def_mapping_enabled = 0
 " }}
 
 " Ruby
@@ -54,14 +87,16 @@ Plugin 'asciidoc/vim-asciidoc'
 " nerdtree {{
 Plugin 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
-map <C-T> :NERDTreeTabsToggle<CR>
 let g:NERDTreeWinSize=24
 " }}
 
 " Surround.vim is all about surroundings
 Plugin 'tpope/vim-surround'
 
-Plugin 'lilydjwg/fcitx.vim'
+" Plugin 'lilydjwg/fcitx.vim'
+
+" YCM
+Plugin 'Valloric/YouCompleteMe'
 
 " snips {{
 " Track the engine.
@@ -93,11 +128,13 @@ let mapleader = ","
 let g:mapleader = ","
 
 " youdao-translater {{
-Bundle 'ianva/vim-youdao-translater'
+Bundle 'hmgle/vim-youdao-translater'
 vnoremap <silent> <leader>ee :<C-u>Ydv<CR>
 nnoremap <silent> <leader>ee :<C-u>Ydc<CR>
 noremap <leader>yd :<C-u>Yde<CR>
 " }}
+
+Bundle 'cespare/vim-toml'
 
 Bundle 'rking/ag.vim'
 
@@ -105,6 +142,8 @@ Bundle 'ap/vim-buftabline'
 
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'digitaltoad/vim-pug'
+Bundle 'junegunn/goyo.vim'
+Bundle 'marijnh/tern_for_vim', {'do': 'npm install'}
 Bundle 'tpope/vim-repeat'
 Bundle 'tpope/vim-abolish'
 " bundle end
@@ -156,7 +195,7 @@ set smartcase
 set hlsearch "Highlight search things
 
 set incsearch "Make search act like search in modern browsers
-set nolazyredraw "Don't redraw while executing macros 
+set nolazyredraw "Don't redraw while executing macros
 
 set magic "Set magic on, for regular expressions
 
@@ -317,7 +356,7 @@ cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
 
 func! Cwd()
   let cwd = getcwd()
-  return "e " . cwd 
+  return "e " . cwd
 endfunc
 
 func! DeleteTillSlash()
@@ -396,7 +435,7 @@ function! <SID>BufcloseCloseIt()
    endif
 endfunction
 
-" Specify the behavior when switching between buffers 
+" Specify the behavior when switching between buffers
 try
   set switchbuf=usetab
   set stal=2
@@ -570,6 +609,14 @@ endfunction
 " JavaScript 缩进 changed by hmg
 au FileType javascript setlocal et sta sw=4 sts=4
 
+" ----------------------------------------------------------------------------
+" tern_for_vim
+" ----------------------------------------------------------------------------
+let tern_show_signature_in_pum = 1
+let tern_show_argument_hints = 'on_hold'
+autocmd FileType javascript nnoremap <leader>d :TernDef<CR>
+autocmd FileType javascript setlocal omnifunc=tern#Complete
+
 " Erlang 缩进 changed by hmg
 au FileType erlang setlocal et sta sw=4 sts=4
 
@@ -612,7 +659,7 @@ map <leader>pp :setlocal paste!<cr>
 map <leader>bb :cd ..<cr>
 
 set nu
-set rnu
+" set rnu "
 :hi linenr ctermfg=lightcyan
 hi Identifier ctermfg=blue cterm=none
 set autoindent
@@ -628,7 +675,7 @@ set shiftwidth=8
 :inoremap [ []<ESC>i
 :inoremap ] <c-r>=ClosePair(']')<CR>
 ":inoremap " ""<ESC>i
- 
+
 function! ClosePair(char)
     if getline('.')[col('.') - 1] == a:char
         return "\<Right>"
@@ -668,13 +715,13 @@ imap jj <esc>
 :nnoremap <silent><C-n> <C-w><C-]><C-w>T
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CSCOPE settings for vim           
+" CSCOPE settings for vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
 " This file contains some boilerplate settings for vim's cscope interface,
 " plus some keyboard mappings that I've found useful.
 "
-" USAGE: 
+" USAGE:
 " -- vim 6:     Stick this file in your ~/.vim/plugin directory (or in a
 "               'plugin' directory in some other directory that is in your
 "               'runtimepath'.
@@ -682,7 +729,7 @@ imap jj <esc>
 " -- vim 5:     Stick this file somewhere and 'source cscope.vim' it from
 "               your ~/.vimrc file (or cut and paste it into your .vimrc).
 "
-" NOTE: 
+" NOTE:
 " These key maps use multiple keystrokes (2 or 3 keys).  If you find that vim
 " keeps timing you out before you can complete them, try changing your timeout
 " settings, as explained below.
@@ -693,7 +740,7 @@ imap jj <esc>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " This tests to see if vim was configured with the '--enable-cscope' option
-" when it was compiled.  If it wasn't, time to recompile vim... 
+" when it was compiled.  If it wasn't, time to recompile vim...
 if has("cscope")
     " set cscopequickfix by hmg 这样会立即跳转到第一个找到的符号，要跳转到别处， 输入 cw 后选择
     :set cscopequickfix=s-,c-,d-,i-,t-,e-
@@ -709,14 +756,14 @@ if has("cscope")
 
     " add any cscope database in current directory
     if filereadable("cscope.out")
-        cs add cscope.out  
-    " else add the database pointed to by environment variable 
+        cs add cscope.out
+    " else add the database pointed to by environment variable
     elseif $CSCOPE_DB != ""
         cs add $CSCOPE_DB
     endif
 
     " show msg when any other cscope db added
-    set cscopeverbose  
+    set cscopeverbose
 
 
     """"""""""""" My cscope/vim key mappings
@@ -755,17 +802,17 @@ if has("cscope")
     " To do the first type of search, hit 'CTRL-\', followed by one of the
     " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
     " search will be displayed in the current window.  You can use CTRL-T to
-    " go back to where you were before the search.  
+    " go back to where you were before the search.
     "
 
-    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>	
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
     nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>	
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 
     " Using 'CTRL-spacebar' (intepreted as CTRL-@ by vim) then a search type
@@ -774,18 +821,18 @@ if has("cscope")
     "
     " (Note: earlier versions of vim may not have the :scs command, but it
     " can be simulated roughly via:
-    "    nmap <C-@>s <C-W><C-S> :cs find s <C-R>=expand("<cword>")<CR><CR>	
+    "    nmap <C-@>s <C-W><C-S> :cs find s <C-R>=expand("<cword>")<CR><CR>
 
-    nmap <C-@>s :scs find s <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-@>g :scs find g <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-@>c :scs find c <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-@>t :scs find t <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-@>e :scs find e <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-@>f :scs find f <C-R>=expand("<cfile>")<CR><CR>	
-    nmap <C-@>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>	
-    nmap <C-@>d :scs find d <C-R>=expand("<cword>")<CR><CR>	
+    nmap <C-@>s :scs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@>g :scs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@>c :scs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@>t :scs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@>e :scs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-@>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    nmap <C-@>d :scs find d <C-R>=expand("<cword>")<CR><CR>
 
-    " Hitting CTRL-space *twice* before the search type does a vertical 
+    " Hitting CTRL-space *twice* before the search type does a vertical
     " split instead of a horizontal one (vim 6 and up only)
     "
     " (Note: you may wish to put a 'set splitright' in your .vimrc
@@ -796,8 +843,8 @@ if has("cscope")
     nmap <C-@><C-@>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
     nmap <C-@><C-@>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
     nmap <C-@><C-@>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>	
-    nmap <C-@><C-@>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>	
+    nmap <C-@><C-@>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-@><C-@>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
     nmap <C-@><C-@>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
 
     function! NewtabCS(cscmd)
@@ -816,7 +863,7 @@ if has("cscope")
 		exe "tabc" . s:newpagnr
 	endif
     endfunction
-    
+
     nmap <C-i>s :call NewtabCS('s')<cr>
     nmap <C-i>g :call NewtabCS('g')<cr>
     nmap <C-i>c :call NewtabCS('c')<cr>
@@ -832,7 +879,7 @@ if has("cscope")
     " You may find that too short with the above typemaps.  If so, you should
     " either turn off mapping timeouts via 'notimeout'.
     "
-    "set notimeout 
+    "set notimeout
     "
     " Or, you can keep timeouts, by uncommenting the timeoutlen line below,
     " with your own personal favorite value (in milliseconds):
@@ -845,7 +892,7 @@ if has("cscope")
     " delays as vim waits for a keystroke after you hit ESC (it will be
     " waiting to see if the ESC is actually part of a key code like <F1>).
     "
-    "set ttimeout 
+    "set ttimeout
     "
     " personally, I find a tenth of a second to work well for key code
     " timeouts. If you experience problems and have a slow terminal or network
@@ -872,7 +919,7 @@ au FileType c,cpp inoremap /* /*  */<ESC>hhi
 au FileType c,cpp,python,markdown,mkd,asciidoc,go,erlang,lua set colorcolumn=81
 
 " 分界线颜色
-hi colorcolumn ctermbg=8 ctermfg=1
+hi colorcolumn ctermbg=240 ctermfg=256
 
 " 同级缩进块跳转
 function! JumpUp()
@@ -922,7 +969,7 @@ function! JumpDown()
 			break
 		endif
 	endwhile
-	
+
 	if DownIndent > CurrIndent
 		" 块的顶部, 以下一行作为参考信息
 		let CurrIndent = DownIndent
@@ -988,7 +1035,7 @@ function! MyC_Help( type )
 	endif
 	setlocal	modifiable
 	"
-	if a:type == 'm' 
+	if a:type == 'm'
 		"
 		" Is there more than one manual ?
 		"
@@ -1004,7 +1051,7 @@ function! MyC_Help( type )
 		" Select manuals where the name exactly matches
 		"
 		for line in catalogs
-			if line =~ '^'.item.'\s\+(' 
+			if line =~ '^'.item.'\s\+('
 				let	itempart	= split( line, '\s\+' )
 				let	catalog		= itempart[1][1:-2]
 				if match( catalog, '.p$' ) == -1
@@ -1111,5 +1158,4 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-" Allow saving of files as sudo when I forgot to start vim using sudo.
-cmap w!! w !sudo tee > /dev/null %
+map <leader>tt :NERDTreeTabsToggle<CR>
