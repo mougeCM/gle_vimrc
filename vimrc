@@ -52,6 +52,9 @@ let g:tagbar_type_go = {
     \ 'ctagsbin'  : 'gotags',
     \ 'ctagsargs' : '-sort -silent'
 \ }
+" save auto savgolint "
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 " 避免和 NERDTreeTabsToggle 键冲突
 " let g:go_def_mapping_enabled = 0
 " }}
@@ -656,7 +659,7 @@ map <leader>pp :setlocal paste!<cr>
 map <leader>bb :cd ..<cr>
 
 set nu
-set rnu
+" set rnu "
 :hi linenr ctermfg=lightcyan
 hi Identifier ctermfg=blue cterm=none
 set autoindent
